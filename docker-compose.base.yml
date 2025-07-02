@@ -126,23 +126,8 @@ services:
 
 volumes:
   nextcloud-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /opt/nextcloud/data
   mariadb-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /opt/nextcloud/mariadb
   redis-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /opt/nextcloud/redis
 
 networks:
   default:
