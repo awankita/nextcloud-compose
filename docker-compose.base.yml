@@ -42,7 +42,7 @@ services:
       - nextcloud-data:/var/www/html
       - ./config/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini:ro
       - ./config/php/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini:ro
-      - ./config/nextcloud/config.php:/var/www/html/config/config.php:z
+      - ./config/nextcloud/config.php:/var/www/html/config/config.php:rw
       - ./logs/nextcloud:/var/log/nextcloud
     networks:
       - shared
