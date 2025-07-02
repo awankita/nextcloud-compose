@@ -200,5 +200,8 @@ $CONFIG = array (
   // Maintenance mode
   'maintenance' => false,
   'singleuser' => false,
+
+  // Make config read-only for Nextcloud
+  'config_is_read_only' => true,
 );
 ?>
