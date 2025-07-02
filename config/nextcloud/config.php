@@ -203,6 +203,5 @@ $CONFIG = array (
 
   // Make config read-only for Nextcloud
   // 'config_is_read_only' => true,
-  'config_is_read_only' => true,
 );
 ?>
