@@ -1,0 +1,55 @@
+# config/prometheus/prometheus.yml
+# Prometheus Configuration for Nextcloud Monitoring
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'nextcloud-production'
+    replica: 'prometheus-01'
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+rule_files:
+  - "nextcloud_alerts.yml"
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node Exporter for system metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 5s
+    metrics_path: /metrics
+
+  # Nextcloud metrics
+  - job_name: 'nextcloud'
+    static_configs:
+      - targets: ['app:9000']
+    scrape_interval: 30s
+    metrics_path: /ocs/v2.php/apps/serverinfo/api/v1/info
+    params:
+      format: ['json']
+    basic_auth:
+      username: 'monitoring'
+      password: 'monitoring-password'
+
+  # MariaDB metrics (using mysqld_exporter)
+  - job_name: 'mariadb'
+    static_configs:
+      - targets: ['mariadb:9104']
+    scrape_interval: 30s
+
+  # Redis metrics (using redis_exporter)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:9121']
+    scrape_interval: 30s

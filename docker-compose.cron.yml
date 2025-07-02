@@ -1,0 +1,16 @@
+services:
+  cron:
+    image: nextcloud:production-fpm-alpine
+    container_name: nextcloud-cron
+    restart: unless-stopped
+    volumes:
+      - nextcloud-data:/var/www/html
+      - ./config/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+    entrypoint: /cron.sh
+    depends_on:
+      - mariadb
+      - redis
+    networks:
+      - default
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
