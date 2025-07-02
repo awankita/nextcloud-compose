@@ -8,11 +8,11 @@ PROJECT_NAME="nextcloud"
 COMPOSE_FILES=(
   docker-compose.base.yml
   docker-compose.web.yml
-  docker-compose.cron.yml
-  docker-compose.elasticsearch.yml
-  docker-compose.observability.yml
-  docker-compose.backup.yml
-  docker-compose.watchtower.yml
+  # docker-compose.cron.yml
+  # docker-compose.elasticsearch.yml
+  # docker-compose.observability.yml
+  # docker-compose.backup.yml
+  # docker-compose.watchtower.yml
 )
 
 # Compose file args

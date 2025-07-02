@@ -6,29 +6,24 @@ $CONFIG = array (
   'instanceid' => 'nextcloud_production_instance',
   'passwordsalt' => 'CHANGE_THIS_TO_RANDOM_STRING',
   'secret' => 'CHANGE_THIS_TO_RANDOM_STRING',
-  'trusted_domains' => 
-  array (
-    0 => 'cloud.yourdomain.com',
-    1 => 'localhost',
-    2 => '127.0.0.1',
-  ),
+  'trusted_domains' => explode(',', getenv('TRUSTED_DOMAINS')),
   'datadirectory' => '/var/www/html/data',
   'dbtype' => 'mysql',
   'version' => '29.0.0.0',
-  'overwrite.cli.url' => 'https://cloud.yourdomain.com',
+  'overwrite.cli.url' => 'https://' . getenv('DOMAIN_NAME'),
   'overwriteprotocol' => 'https',
-  'overwritehost' => 'cloud.yourdomain.com',
+  'overwritehost' => getenv('DOMAIN_NAME'),
   'overwritewebroot' => '',
   'htaccess.RewriteBase' => '/',
   
   // Database configuration
-  'dbname' => 'nextcloud',
+  'dbname' => getenv('MYSQL_DATABASE'),
   'dbhost' => 'mariadb',
   'dbport' => '',
   'dbtableprefix' => 'oc_',
   'mysql.utf8mb4' => true,
-  'dbuser' => 'nextcloud',
-  'dbpassword' => 'REPLACE_WITH_ENV_VALUE',
+  'dbuser' => getenv('MYSQL_USER'),
+  'dbpassword' => getenv('MYSQL_PASSWORD'),
   
   // Redis configuration for caching and file locking
   'memcache.local' => '\OC\Memcache\APCu',
@@ -38,7 +33,7 @@ $CONFIG = array (
   array (
     'host' => 'redis',
     'port' => 6379,
-    'password' => 'REPLACE_WITH_ENV_VALUE',
+    'password' => getenv('REDIS_PASSWORD'),
     'timeout' => 0.0,
     'dbindex' => 0,
   ),
@@ -49,27 +44,23 @@ $CONFIG = array (
   
   // S3 Object Storage
   'objectstore' => array(
-    'class' => '\OC\Files\ObjectStore\S3',
+    'class' => '\\OC\\Files\\ObjectStore\\S3',
     'arguments' => array(
-      'bucket' => 'nextcloud-production-storage',
-      'key' => 'REPLACE_WITH_ENV_VALUE',
-      'secret' => 'REPLACE_WITH_ENV_VALUE',
-      'hostname' => 's3.amazonaws.com',
-      'port' => 443,
-      'use_ssl' => true,
-      'region' => 'us-east-1',
-      'use_path_style' => false,
+      'bucket' => getenv('S3_BUCKET'),
+      'key' => getenv('S3_ACCESS_KEY'),
+      'secret' => getenv('S3_SECRET_KEY'),
+      'hostname' => getenv('S3_ENDPOINT'),
+      'port' => (int)getenv('S3_PORT'),
+      'use_ssl' => getenv('S3_SSL') === 'true',
+      'region' => getenv('S3_REGION'),
+      'use_path_style' => true,
       'autocreate' => true,
-      'sse_c' => true,
-      'sse_c_key' => 'REPLACE_WITH_RANDOM_256BIT_KEY',
+      'sse_c' => false,
     ),
   ),
   
   // Trusted proxies (Nginx)
-  'trusted_proxies' => 
-  array (
-    0 => '172.20.0.0/16',
-  ),
+  'trusted_proxies' => explode(',', getenv('TRUSTED_PROXIES')),
   'forwarded_for_headers' => 
   array (
     0 => 'HTTP_X_FORWARDED_FOR',
@@ -91,13 +82,13 @@ $CONFIG = array (
   'mail_smtpmode' => 'smtp',
   'mail_smtpsecure' => 'tls',
   'mail_sendmailmode' => 'smtp',
-  'mail_from_address' => 'no-reply',
-  'mail_domain' => 'yourdomain.com',
-  'mail_smtphost' => 'smtp.yourdomain.com',
-  'mail_smtpport' => 587,
+  'mail_from_address' => getenv('MAIL_FROM_ADDRESS'),
+  'mail_domain' => getenv('MAIL_DOMAIN'),
+  'mail_smtphost' => getenv('SMTP_HOST'),
+  'mail_smtpport' => (int)getenv('SMTP_PORT'),
   'mail_smtpauth' => 1,
-  'mail_smtpname' => 'REPLACE_WITH_ENV_VALUE',
-  'mail_smtppassword' => 'REPLACE_WITH_ENV_VALUE',
+  'mail_smtpname' => getenv('SMTP_NAME'),
+  'mail_smtppassword' => getenv('SMTP_PASSWORD'),
   
   // Performance and caching
   'default_phone_region' => 'US',
