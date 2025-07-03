@@ -1,0 +1,49 @@
+name: Build and Publish Nextcloud Compose Generator
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build
+        run: |
+          mkdir -p bin
+          go build -o bin/nextcloud-gen ./cmd/...
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextcloud-gen
+          path: bin/nextcloud-gen
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nextcloud-gen
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: nextcloud-gen
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
