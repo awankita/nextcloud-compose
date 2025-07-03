@@ -1,0 +1,42 @@
+[
+  {
+    "id": "env1",
+    "name": "awankita",
+    "domain": "awankita.local",
+    "port": 8080,
+    "created_at": "2025-07-01T00:00:00Z",
+    "updated_at": "2025-07-01T00:00:00Z",
+    "nextcloud_config": {
+      "admin_user": "admin",
+      "admin_password": "admin123"
+    },
+    "database_config": {
+      "root_password": "rootpassword",
+      "database": "nextcloud",
+      "user": "nextclouduser",
+      "password": "nextcloudpassword"
+    },
+    "redis_config": {
+      "password": "redispassword"
+    },
+    "s3_config": {
+      "bucket": "nextcloud-bucket",
+      "access_key": "s3accesskey",
+      "secret_key": "s3secretkey",
+      "region": "us-west-1",
+      "endpoint": "s3.amazonaws.com",
+      "port": "443",
+      "ssl": "true"
+    },
+    "smtp_config": {
+      "from_address": "",
+      "domain": "awankita.local",
+      "host": "smtp.awankita.local",
+      "secure": "tls",
+      "port": "587",
+      "auth_type": "login",
+      "name": "awankita",
+      "password": "smtppassword"
+    }
+  }
+]
