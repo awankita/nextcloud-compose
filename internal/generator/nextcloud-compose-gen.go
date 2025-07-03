@@ -136,6 +136,8 @@ volumes:
 %s
 
 networks:
+  shared:
+	external: true
   {{.Name}}-nextcloud:
     driver: bridge
 `, strings.Join(volumes, "\n"))
