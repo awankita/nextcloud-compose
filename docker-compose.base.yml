@@ -1,5 +1,62 @@
 services:
 
+  # Nextcloud Standalone (with built-in Apache webserver)
+  app-standalone:
+    image: nextcloud:production-apache
+    container_name: nextcloud-app-standalone
+    restart: unless-stopped
+    environment:
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_HOST=mariadb
+      - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}
+      - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
+      - NEXTCLOUD_TRUSTED_DOMAINS=${TRUSTED_DOMAINS}
+      - REDIS_HOST=redis
+      - REDIS_HOST_PORT=6379
+      - REDIS_HOST_PASSWORD=${REDIS_PASSWORD}
+      - OBJECTSTORE_S3_BUCKET=${S3_BUCKET}
+      - OBJECTSTORE_S3_KEY=${S3_ACCESS_KEY}
+      - OBJECTSTORE_S3_SECRET=${S3_SECRET_KEY}
+      - OBJECTSTORE_S3_REGION=${S3_REGION}
+      - OBJECTSTORE_S3_HOST=${S3_ENDPOINT}
+      - OBJECTSTORE_S3_PORT=${S3_PORT}
+      - OBJECTSTORE_S3_SSL=${S3_SSL}
+      - OBJECTSTORE_S3_USEPATH_STYLE=true
+      - PHP_MEMORY_LIMIT=1024M
+      - PHP_UPLOAD_LIMIT=10G
+      - APACHE_DISABLE_REWRITE_IP=1
+      - TRUSTED_PROXIES=${TRUSTED_PROXIES}
+      - OVERWRITEPROTOCOL=https
+      - OVERWRITEHOST=${DOMAIN_NAME}
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
+      - MAIL_DOMAIN=${MAIL_DOMAIN}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_SECURE=${SMTP_SECURE}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_AUTHTYPE=${SMTP_AUTHTYPE}
+      - SMTP_NAME=${SMTP_NAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+    volumes:
+      - nextcloud-data:/var/www/html
+      - ./config/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+      - ./config/php/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini:ro
+      - ./logs/nextcloud:/var/log/nextcloud:z
+    networks:
+      - shared
+      - default
+    depends_on:
+      - mariadb
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/status.php"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
   # Nextcloud Application - Multiple replicas for HA
   app:
     image: nextcloud:production-fpm-alpine
@@ -42,7 +99,7 @@ services:
       - nextcloud-data:/var/www/html
       - ./config/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini:ro
       - ./config/php/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini:ro
-      - ./logs/nextcloud:/var/log/nextcloud
+      - ./logs/nextcloud:/var/log/nextcloud:z
     networks:
       - shared
       - default
@@ -84,7 +141,7 @@ services:
       - mariadb-data:/var/lib/mysql
       - ./config/mariadb/my.cnf:/etc/mysql/conf.d/nextcloud.cnf:ro
       - ./backups/mariadb:/backups
-      - ./logs/mariadb:/var/log/mysql
+      - ./logs/mariadb:/var/log/mysql:z
     networks:
       - default
     healthcheck:
