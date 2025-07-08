@@ -1,6 +1,6 @@
 package generator
 
-const defaultPHPConfig = `memory_limit = 1024M
+const phpiniTemplate = `memory_limit = 1024M
 max_execution_time = 3600
 max_input_time = 3600
 max_input_vars = 10000
@@ -45,7 +45,7 @@ opcache.dups_fix = 0
 opcache.blacklist_filename=""
 `
 
-const defaultMariaDBConfig = `[mysqld]
+const mycnfTemplate = `[mysqld]
 user = mysql
 pid-file = /var/run/mysqld/mysqld.pid
 socket = /var/run/mysqld/mysqld.sock

@@ -25,10 +25,19 @@ func main() {
 
 	// Generate each instance
 	for _, env := range environments {
-		outputDir := filepath.Join("./output", env.Name)
-		gen := generator.NewNextcloudComposeGenerator(outputDir)
+		outputDir := filepath.Join("./environemnts")
+		opt := &generator.NextcloudComposeGeneratorOptions{
+			Name:            env.Name,
+			Domain:          env.Domain,
+			NextcloudConfig: env.NextcloudConfig,
+			DatabaseConfig:  env.DatabaseConfig,
+			RedisConfig:     env.RedisConfig,
+			S3Config:        env.S3Config,
+			SMTPConfig:      env.SMTPConfig,
+		}
+		gen := generator.NewNextcloudComposeGenerator(outputDir, opt)
 
-		if err := gen.Generate(env); err != nil {
+		if err := gen.Generate(); err != nil {
 			fmt.Printf("❌ Failed to generate for %s: %v\n", env.Name, err)
 		} else {
 			fmt.Printf("✅ Successfully generated config for %s\n", env.Name)

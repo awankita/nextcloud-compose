@@ -9,13 +9,25 @@ import (
 	"text/template"
 )
 
+type NextcloudComposeGeneratorOptions struct {
+	Name            string
+	Domain          string
+	NextcloudConfig models.NextcloudConfig
+	DatabaseConfig  models.DatabaseConfig
+	RedisConfig     models.RedisConfig
+	S3Config        models.S3Config
+	SMTPConfig      models.SMTPConfig
+}
+
 type NextcloudComposeGenerator struct {
+	option   *NextcloudComposeGeneratorOptions
 	basePath string
 }
 
-func NewNextcloudComposeGenerator(basePath string) *NextcloudComposeGenerator {
+func NewNextcloudComposeGenerator(basePath string, option *NextcloudComposeGeneratorOptions) *NextcloudComposeGenerator {
 	return &NextcloudComposeGenerator{
 		basePath: basePath,
+		option:   option,
 	}
 }
 
@@ -29,8 +41,6 @@ func (g *NextcloudComposeGenerator) templateAppService() string {
     image: nextcloud:production-apache
     container_name: {{.Name}}-nextcloud-app
     restart: unless-stopped
-    ports:
-      - "{{.Port}}:80"
     environment:
       - MYSQL_HOST={{.Name}}-mariadb
       - MYSQL_USER={{.DatabaseConfig.User}}
@@ -73,6 +83,7 @@ func (g *NextcloudComposeGenerator) templateAppService() string {
       - {{.Name}}-nextcloud-data:/var/www/html
       - ./config/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini:ro
     networks:
+	    - shared
       - {{.Name}}-nextcloud
     depends_on:
       - mariadb
@@ -137,13 +148,13 @@ volumes:
 
 networks:
   shared:
-	external: true
+    external: true
   {{.Name}}-nextcloud:
     driver: bridge
 `, strings.Join(volumes, "\n"))
 }
 
-func (g *NextcloudComposeGenerator) Generate(env *models.NextcloudEnvironment) error {
+func (g *NextcloudComposeGenerator) Generate() error {
 	var parts []string
 
 	parts = append(parts, g.templateHeader())
@@ -159,7 +170,7 @@ func (g *NextcloudComposeGenerator) Generate(env *models.NextcloudEnvironment) e
 		return err
 	}
 
-	environmentDir := filepath.Join(g.basePath, env.Name)
+	environmentDir := filepath.Join(g.basePath, g.option.Name)
 	if err := os.MkdirAll(environmentDir, 0755); err != nil {
 		return err
 	}
@@ -174,7 +185,7 @@ func (g *NextcloudComposeGenerator) Generate(env *models.NextcloudEnvironment) e
 	}
 	defer file.Close()
 
-	return tmpl.Execute(file, env)
+	return tmpl.Execute(file, g.option)
 }
 
 func (g *NextcloudComposeGenerator) createDefaultConfigs(companyDir string) error {
@@ -182,7 +193,7 @@ func (g *NextcloudComposeGenerator) createDefaultConfigs(companyDir string) erro
 	if err := os.MkdirAll(filepath.Dir(phpIniPath), 0755); err != nil {
 		return err
 	}
-	if err := os.WriteFile(phpIniPath, []byte(defaultPHPConfig), 0644); err != nil {
+	if err := os.WriteFile(phpIniPath, []byte(phpiniTemplate), 0644); err != nil {
 		return err
 	}
 
@@ -190,7 +201,7 @@ func (g *NextcloudComposeGenerator) createDefaultConfigs(companyDir string) erro
 	if err := os.MkdirAll(filepath.Dir(myCnfPath), 0755); err != nil {
 		return err
 	}
-	if err := os.WriteFile(myCnfPath, []byte(defaultMariaDBConfig), 0644); err != nil {
+	if err := os.WriteFile(myCnfPath, []byte(mycnfTemplate), 0644); err != nil {
 		return err
 	}
 
